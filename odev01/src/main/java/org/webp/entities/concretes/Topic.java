@@ -1,4 +1,4 @@
-package org.webp.project.entities.concretes;
+package org.webp.entities.concretes;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,7 @@ public class Topic {
 
     @Id
     @Column(name="topic_id")
+
     private int topicId;
 
     @Column(name="topic_name")

@@ -1,4 +1,4 @@
-package org.webp.project.entities.concretes;
+package org.webp.entities.concretes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +15,9 @@ import java.util.List;
 @Table(name="users")
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")

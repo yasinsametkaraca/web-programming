@@ -1,4 +1,4 @@
-package org.webp.project.entities.concretes;
+package org.webp.entities.concretes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +30,4 @@ public class Comment {
     @ManyToOne()
     @JoinColumn(name = "topic_id")
     private Topic topic;
-
-
 }
