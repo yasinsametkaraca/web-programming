@@ -4,13 +4,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InsertTest {
 
@@ -27,17 +27,18 @@ public class InsertTest {
     @AfterEach
     public void tearDown() {
         //her bir test calistiktan sonra BeforeEach calistirilir
-
         em.close();
         factory.close();
     }
 
-    private boolean persistInATransaction(Object obj) {
+    private boolean persistInATransaction(Object... obj) {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
         try {
-            em.persist(obj);
+            for(Object o : obj) {
+                em.persist(o);
+            }
             tx.commit();
         } catch (Exception e) {
             System.out.println("FAILED TRANSACTION: " + e.toString());
@@ -48,25 +49,121 @@ public class InsertTest {
         return true;
     }
 
-
     @Test
-    public void insertMovie() {
+    public void testCar(){
 
-        MovieDetails movie = new MovieDetails();
-        movie.setId(1L);
+        Car car = new Car();
+        car.setDescription("degiseni yoktur");
+        car.setColor("blue");
+        car.setKilometer(10000);
+        car.setYear(2000);
 
-        boolean persisted = persistInATransaction(movie);
-        assertTrue(persisted);
+        boolean persisted = persistInATransaction(car);
+
+        assertFalse(persisted); //It is false because model is missing
     }
 
     @Test
-    public void insertSong() {
+    public void testCarWithModel(){
+        Brand brand = new Brand();
+        brand.setName("Toyota");
 
-        Song song = new Song();
-        song.setId(2L);
+        Model model = new Model();
+        model.setName("Corolla");
 
-        boolean persisted = persistInATransaction(song);
-        assertTrue(persisted); // "Song" adında bir tablo yok
+        brand.getModels().add(model);
+        model.setParent(brand);
+
+        Car car = new Car();
+        car.setDescription("degiseni yoktur");
+        car.setYear(2000);
+        car.setKilometer(1000);
+        car.setColor("blue");
+        car.setModel(model);
+        assertTrue(persistInATransaction(brand,model,car));
+    }
+
+    @Test
+    public void testTooLongName() {
+        String name = new String(new char[150]);
+
+        Brand brand = new Brand();
+        brand.setName(name);
+        assertFalse(persistInATransaction(brand));
+
+        brand.setId(null);
+        brand.setName("hyundai");
+
+        assertTrue(persistInATransaction(brand));
+
+    }
+    @Test
+    public void testUniqueName() {
+
+        String name = "toyota";
+
+        Brand brand = new Brand();
+        brand.setName(name);
+
+        assertTrue(persistInATransaction(brand));
+
+        Brand anotherBrand = new Brand();
+        anotherBrand.setName(name);
+
+        assertFalse(persistInATransaction(anotherBrand));
+    }
+
+
+    private Car createCar(Model model,String color){
+        Car car = new Car();
+        car.setKilometer(1);
+        car.setDescription("Araba Sıfırdır.");
+        car.setYear(2022);
+        car.setColor(color);
+
+        car.setModel(model);
+
+        return car;
+    }
+    private Model addModel(Brand brand,String modelName){
+        Model model = new Model();
+        model.setName(modelName);
+
+        brand.getModels().add(model);
+        model.setParent(brand);
+
+        return model;
+    }
+
+    @Test
+    public void testQueries(){
+        Brand toyota= new Brand();
+        toyota.setName("Toyota");
+
+        Model corolla = addModel(toyota,"Corolla");
+        Model yaris = addModel(toyota,"Yaris");
+        Model auris = addModel(toyota,"Auris");
+
+        assertTrue(persistInATransaction(toyota, corolla, yaris, auris));
+
+        Car blue = createCar(corolla,"blue");
+        Car green = createCar(corolla,"green");
+        Car black = createCar(yaris,"black");
+        Car white = createCar(auris,"white");
+
+        assertTrue(persistInATransaction(blue,green,black,white));
+        TypedQuery<Car> queryCorolla = em.createQuery(
+                "select c from Car c where c.model.name='Corolla'",Car.class);
+        List<Car> carJPA = queryCorolla.getResultList();
+        assertEquals(2, carJPA.size());
+        assertTrue(carJPA.stream().anyMatch(c -> c.getColor().equals("blue")));
+        assertTrue(carJPA.stream().anyMatch(c -> c.getColor().equals("green")));
+
+        TypedQuery<Car> queryToyota = em.createQuery(
+                "select c from Car c where c.model.parent.name='Toyota'",Car.class);
+        List<Car> all = queryToyota.getResultList();
+        assertEquals(4, all.size());
+
     }
 
 }

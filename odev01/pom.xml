@@ -78,6 +78,8 @@
             <version>${version.javax.el}</version>
         </dependency>
 
+
+
         <!-- EclipseLink için -->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
@@ -94,12 +96,6 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${version.junit}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
