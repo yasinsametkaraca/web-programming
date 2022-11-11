@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.persistence.*;
 
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -97,6 +96,7 @@ public class InsertTest {
         assertTrue(persistInATransaction(brand));
 
     }
+
     @Test
     public void testUniqueName() {
 
@@ -112,7 +112,6 @@ public class InsertTest {
 
         assertFalse(persistInATransaction(anotherBrand));
     }
-
 
     private Car createCar(Model model,String color){
         Car car = new Car();
@@ -164,7 +163,5 @@ public class InsertTest {
                 "select c from Car c where c.model.parent.name='Toyota'",Car.class);
         List<Car> all = queryToyota.getResultList();    //4 tane toyota markalı araba vardır.
         assertEquals(4, all.size());
-
     }
-
 }
