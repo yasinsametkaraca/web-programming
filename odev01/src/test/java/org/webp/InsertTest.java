@@ -152,16 +152,17 @@ public class InsertTest {
         Car white = createCar(auris,"white");
 
         assertTrue(persistInATransaction(blue,green,black,white));
+
         TypedQuery<Car> queryCorolla = em.createQuery(
                 "select c from Car c where c.model.name='Corolla'",Car.class);
-        List<Car> carJPA = queryCorolla.getResultList();
-        assertEquals(2, carJPA.size());
-        assertTrue(carJPA.stream().anyMatch(c -> c.getColor().equals("blue")));
-        assertTrue(carJPA.stream().anyMatch(c -> c.getColor().equals("green")));
+        List<Car> carCorolla = queryCorolla.getResultList();
+        assertEquals(2, carCorolla.size()); //2 tane corolla modeli vardır.
+        assertTrue(carCorolla.stream().anyMatch(c -> c.getColor().equals("blue")));
+        assertTrue(carCorolla.stream().anyMatch(c -> c.getColor().equals("green")));
 
         TypedQuery<Car> queryToyota = em.createQuery(
                 "select c from Car c where c.model.parent.name='Toyota'",Car.class);
-        List<Car> all = queryToyota.getResultList();
+        List<Car> all = queryToyota.getResultList();    //4 tane toyota markalı araba vardır.
         assertEquals(4, all.size());
 
     }
