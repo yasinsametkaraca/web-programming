@@ -19,6 +19,7 @@ public class Car {
     private Model model;
 
     @NotNull
+    @Size(max=32)
     private String color;
 
     @NotNull
